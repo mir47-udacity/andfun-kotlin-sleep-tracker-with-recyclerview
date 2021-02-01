@@ -30,11 +30,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-private val ITEM_VIEW_TYPE_HEADER = 0
-private val ITEM_VIEW_TYPE_ITEM = 1
+private const val ITEM_VIEW_TYPE_HEADER = 0
+private const val ITEM_VIEW_TYPE_ITEM = 1
 
-class SleepNightAdapter(val clickListener: SleepNightListener) : ListAdapter<DataItem,
-        RecyclerView.ViewHolder>(SleepNightDiffCallback()) {
+class SleepNightAdapter(
+    private val clickListener: SleepNightListener
+) : ListAdapter<DataItem, RecyclerView.ViewHolder>(SleepNightDiffCallback()) {
 
     private val adapterScope = CoroutineScope(Dispatchers.Default)
 
@@ -52,7 +53,7 @@ class SleepNightAdapter(val clickListener: SleepNightListener) : ListAdapter<Dat
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (holder) {
-            is ViewHolder -> {
+            is SleepViewHolder -> {
                 val nightItem = getItem(position) as DataItem.SleepNightItem
                 holder.bind(clickListener, nightItem.sleepNight)
             }
@@ -62,8 +63,8 @@ class SleepNightAdapter(val clickListener: SleepNightListener) : ListAdapter<Dat
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
             ITEM_VIEW_TYPE_HEADER -> TextViewHolder.from(parent)
-            ITEM_VIEW_TYPE_ITEM -> ViewHolder.from(parent)
-            else -> throw ClassCastException("Unknown viewType ${viewType}")
+            ITEM_VIEW_TYPE_ITEM -> SleepViewHolder.from(parent)
+            else -> throw ClassCastException("Unknown viewType $viewType")
         }
     }
 
@@ -84,7 +85,7 @@ class SleepNightAdapter(val clickListener: SleepNightListener) : ListAdapter<Dat
         }
     }
 
-    class ViewHolder private constructor(val binding: ListItemSleepNightBinding)
+    class SleepViewHolder private constructor(val binding: ListItemSleepNightBinding)
         : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(clickListener: SleepNightListener, item: SleepNight) {
@@ -94,11 +95,11 @@ class SleepNightAdapter(val clickListener: SleepNightListener) : ListAdapter<Dat
         }
 
         companion object {
-            fun from(parent: ViewGroup): ViewHolder {
+            fun from(parent: ViewGroup): SleepViewHolder {
                 val layoutInflater = LayoutInflater.from(parent.context)
                 val binding = ListItemSleepNightBinding.inflate(layoutInflater, parent, false)
 
-                return ViewHolder(binding)
+                return SleepViewHolder(binding)
             }
         }
     }
